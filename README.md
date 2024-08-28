@@ -6,7 +6,7 @@
 
 ## Getting Started
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/IGoDnc?referralCode=ruU7JR)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/10iW1q)
 
 # License
 

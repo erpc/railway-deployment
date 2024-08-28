@@ -7,13 +7,13 @@ database:
 projects:
   - id: main
     upstreams:
-      {{ if getenv "DRPC.ORG_API_KEY" }}
-      - endpoint: drpc://{{ getenv "DRPC.ORG_API_KEY" }}
+      {{ if getenv "ALCHEMY_API_KEY" }}
+      - endpoint: alchemy://{{ getenv "ALCHEMY_API_KEY" }}
       {{ end }}
-      {{ if getenv "BLASTAPI.IO_API_KEY" }}
-      - endpoint: blastapi://{{ getenv "BLASTAPI.IO_API_KEY" }}
+      {{ if getenv "BLASTAPI_API_KEY" }}
+      - endpoint: blastapi://{{ getenv "BLASTAPI_API_KEY" }}
       {{ end }}
-      {{ if getenv "ALCHEMY.COM_API_KEY" }}
-      - endpoint: alchemy://{{ getenv "ALCHEMY.COM_API_KEY" }}
+      {{ if getenv "DRPC_API_KEY" }}
+      - endpoint: drpc://{{ getenv "DRPC_API_KEY" }}
       {{ end }}
       - endpoint: envio://rpc.hypersync.xyz

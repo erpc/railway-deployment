@@ -7,9 +7,9 @@ RUN apk add --no-cache curl && \
     chmod +x /usr/local/bin/gomplate
 
 # Set environment variables (these can be empty or set by your CI/CD environment)
-ENV DRPC.ORG_API_KEY=""
-ENV BLASTAPI.IO_API_KEY=""
-ENV ALCHEMY.COM_API_KEY=""
+ENV ALCHEMY_API_KEY=""
+ENV BLASTAPI_API_KEY=""
+ENV DRPC_API_KEY=""
 
 # Copy the template config
 COPY erpc.yaml /root/erpc.yaml.template

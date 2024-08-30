@@ -4,6 +4,17 @@ database:
   evmJsonRpcCache:
     driver: memory
 
+server:
+  httpHostV4: "0.0.0.0"
+  httpHostV6: "[::]"
+  httpPort: 4000
+  
+metrics:
+  enabled: true
+  hostV4: "0.0.0.0"
+  hostV6: "[::]"
+  port: 4001
+
 projects:
   - id: main
     upstreams:

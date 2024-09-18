@@ -6,6 +6,7 @@ database:
 
 server:
   httpHostV4: "0.0.0.0"
+  listenV6: true
   httpHostV6: "[::]"
   httpPort: 4000
   

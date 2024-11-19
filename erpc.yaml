@@ -44,3 +44,28 @@ projects:
       - endpoint: drpc://{{ getenv "DRPC_API_KEY" }}
       {{ end }}
       - endpoint: envio://rpc.hypersync.xyz
+
+# Rate limiter allows you to create "shared" budgets for upstreams.
+# For example upstream A and B can use the same budget, which means both of them together must not exceed the defined limits.
+rateLimiters:
+  budgets:
+    - id: default-budget
+      rules:
+        - method: "*"
+          maxCount: 10000
+          period: 1s
+    - id: global-blast
+      rules:
+        - method: "*"
+          maxCount: 1000
+          period: 1s
+    - id: global-quicknode
+      rules:
+        - method: "*"
+          maxCount: 300
+          period: 1s
+    - id: frontend-budget
+      rules:
+        - method: "*"
+          maxCount: 500
+          period: 1s

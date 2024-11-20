@@ -14,15 +14,52 @@ server:
   listenV6: true
   httpHostV6: "[::]"
   httpPort: 4000
+  maxTimeout: 30s
+  enableGzip: true
 
 metrics:
   enabled: true
   hostV4: "0.0.0.0"
+  listenV6: true
   hostV6: "[::]"
   port: 4001
 
 projects:
   - id: main
+    networks:
+      - architecture: evm
+        evm:
+          chainId: 42161
+        failsafe:
+          timeout:
+            # Network-level timeout applies to the whole lifecycle of the request,
+            # this includes retries on network and/or upstream level.
+            duration: 30s
+          hedge:
+            delay: 500ms
+            maxCount: 1
+          circuitBreaker:
+            # e.g. if 30 requests have failed out of last 100 requests, circuit breaker on:
+            failureThresholdCount: 30
+            failureThresholdCapacity: 100
+            # How long to wait before trying to re-enable the upstream after circuit breaker was opened.
+            halfOpenAfter: 60s
+            # e.g. after 8/10 requests have succeeded, kill circuit breaker:
+            successThresholdCount: 8
+            successThresholdCapacity: 10
+          retry:
+            # Total retries besides the initial request:
+            maxCount: 3
+            # Min delay between retries:
+            delay: 250ms
+            # Maximum delay between retries:
+            backoffMaxDelay: 5s
+            # Multiplier for each retry for exponential backoff:
+            backoffFactor: 0.3
+            # Random jitter to avoid thundering herd,
+            # e.g. add between 0 to 500ms to each retry delay:
+            jitter: 250ms
+          #...
     upstreams:
       - id: alchemy
         endpoint: alchemy://$ALCHEMY_API_KEY
@@ -35,22 +72,198 @@ projects:
             backoffMaxDelay: 10s
             backoffFactor: 0.3
             jitter: 500ms
+          rateLimitAutoTune:
+            enabled: true                # Enable auto-tuning (default: true)
+            adjustmentPeriod: "1m"       # How often to adjust the rate limit (default: "1m")
+            errorRateThreshold: 0.1      # Maximum acceptable error rate (default: 0.1)
+            increaseFactor: 1.05         # Factor to increase the limit by (default: 1.05)
+            decreaseFactor: 0.9          # Factor to decrease the limit by (default: 0.9)
+            minBudget: 1                 # Minimum rate limit (default: 0)
+            maxBudget: 10000             # Maximum rate limit (default: 10000)
       # - id: envio
       #   endpoint: envio://rpc.hypersync.xyz
       - id: infura
         endpoint: infura://$INFURA_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
       - id: onerpc
+        type: evm
+        evm:
+          chainId: 42161
         endpoint: https://1rpc.io/$ONERPC_API_KEY/arb
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
       - id: llama
+        type: evm
+        evm:
+          chainId: 42161
         endpoint: https://arbitrum.llamarpc.com/$LLAMA_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: llama-eth-public
+        type: evm
+        evm:
+          chainId: 1
+        endpoint: https://eth.llamarpc.com
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: llama-op-public
+        type: evm
+        evm:
+          chainId: 10
+        endpoint: https://optimism.llamarpc.com
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: llama-bnb-public
+        type: evm
+        evm:
+          chainId: 56
+        endpoint: https://binance.llamarpc.com
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: llama-base-public
+        type: evm
+        evm:
+          chainId: 8453
+        endpoint: https://base.llamarpc.com
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: llama-arb-public
+        type: evm
+        evm:
+          chainId: 42161
+        endpoint: https://arbitrum.llamarpc.com
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: llama-arb-public
+        type: evm
+        evm:
+          chainId: 137
+        endpoint: https://polygon.llamarpc.com
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
       - id: chainstack-arb
+        type: evm
+        evm:
+          chainId: 42161
         endpoint: https://arbitrum-mainnet.core.chainstack.com/$CS_ARB_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
       - id: chainstack-eth
+        type: evm
+        evm:
+          chainId: 1
         endpoint: https://ethereum-mainnet.core.chainstack.com/$CS_ETH_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
       - id: moralis-one
+        type: evm
+        evm:
+          chainId: 42161
         endpoint: https://site1.moralis-nodes.com/arbitrum/$MORALIS_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
       - id: moralis-two
+        type: evm
+        evm:
+          chainId: 42161
         endpoint: https://site2.moralis-nodes.com/arbitrum/$MORALIS_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: chainstack-binance
+        type: evm
+        evm:
+          chainId: 56
+        endpoint: https://bsc-mainnet.core.chainstack.com/$CS_BNB_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: chainstack-polygon
+        type: evm
+        evm:
+          chainId: 137
+        endpoint: https://polygon-mainnet.core.chainstack.com/$CS_POL_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: chainstack-blast
+        type: evm
+        evm:
+          chainId: 81457
+        endpoint: https://blast-mainnet.core.chainstack.com/$CS_BLAST_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: chainstack-optimism
+        type: evm
+        evm:
+          chainId: 10
+        endpoint: https://optimism-mainnet.core.chainstack.com/$CS_OP_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: chainstack-base
+        type: evm
+        evm:
+          chainId: 8453
+        endpoint: https://base-mainnet.core.chainstack.com/$CS_BASE_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: chainstack-arb-two
+        type: evm
+        evm:
+          chainId: 42161
+        endpoint: https://arbitrum-mainnet.core.chainstack.com/$CS_ARB2_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: chainstack-arb-test
+        type: evm
+        evm:
+          chainId: 42161
+        endpoint: https://arbitrum-sepolia.core.chainstack.com/$CS_ARB_API_KEY_TEST
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: chainstack-arb-sep-test
+        type: evm
+        evm:
+          chainId: 421614
+        endpoint: https://arbitrum-sepolia.core.chainstack.com/$CS_ARBSEP_API_KEY_TEST
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: drpc-eth-sep
+        type: evm
+        evm:
+          chainId: 11155111
+        endpoint: https://sepolia.drpc.org
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+      - id: panda-eth-sep
+        type: evm
+        evm:
+          chainId: 11155111
+        endpoint: https://rpc.sepolia.ethpandaops.io
+        ignoreMethods:
+          - "alchemy_*"
+          - "eth_traceTransaction"
+
 
 # Rate limiter allows you to create "shared" budgets for upstreams.
 # For example upstream A and B can use the same budget, which means both of them together must not exceed the defined limits.

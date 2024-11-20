@@ -27,7 +27,7 @@ metrics:
   port: 4001
 
 projects:
-  - id: main
+  - id: masternode
     upstreams:
       - endpoint: alchemy://{{ getenv "ALCHEMY_API_KEY" }}
       - endpoint: envio://rpc.hypersync.xyz

@@ -1,20 +1,15 @@
 logLevel: debug
 
-# There are various use-cases of database in erpc, such as caching, dynamic configs, rate limit persistence, etc.
 database:
-  # `evmJsonRpcCache` defines the destination for caching JSON-RPC cals towards any EVM architecture upstream.
-  # This database is non-blocking on critical path, and is used as best-effort.
-  # Make sure the storage requirements meet your usage, for example caching 70m blocks + 10m txs + 10m traces on Arbitrum needs 200GB of storage.
   evmJsonRpcCache:
-    # Refer to "Database" section for more details.
-    # Note that table, schema and indexes will be created automatically if they don't exist.
     driver: redis
     redis:
-      addr: {{ REDIS_URL }}
-      password: {{ REDIS_PASSWORD }}
+      addr: $REDIS_ADDR
+      password: $REDIS_PASSWORD
       db: 0
 
 server:
+  listenV4: true
   httpHostV4: "0.0.0.0"
   listenV6: true
   httpHostV6: "[::]"
@@ -27,107 +22,57 @@ metrics:
   port: 4001
 
 projects:
-  - id: masternode
+  - id: main
     upstreams:
-      - endpoint: alchemy://{{ getenv "ALCHEMY_API_KEY" }}
-      - endpoint: envio://rpc.hypersync.xyz
-      - endpoint: infura://{{ getenv "INFURA_API_KEY" }}
-        id: infura
-        type: evm
-        evm:
-          # (OPTIONAL) chainId is optional and will be detected. DEFAULT: auto-detected.
-          chainId: 42161
-          # (OPTIONAL) statePollerInterval used to periodically fetch the latest/finalized/sync states. DEFAULT: 30s.
-          statePollerInterval: 30s
-          # (OPTIONAL) nodeType is optional and you can manually set it to "full" or "archive". DEFAULT: archive
-          nodeType: full
-          # (OPTIONAL) maxAvailableRecentBlocks limits the number of recent blocks DEFAULT: 128 (for "full" nodes).
-          maxAvailableRecentBlocks: 128
-        # ...
-      - endpoint: https://1rpc.io/{{ getenv "ONERPC_API_KEY" }}/arb
-        id: onerpc
-        type: evm
-        evm:
-          # (OPTIONAL) chainId is optional and will be detected. DEFAULT: auto-detected.
-          chainId: 42161
-          # (OPTIONAL) statePollerInterval used to periodically fetch the latest/finalized/sync states. DEFAULT: 30s.
-          statePollerInterval: 30s
-          # (OPTIONAL) nodeType is optional and you can manually set it to "full" or "archive". DEFAULT: archive
-          nodeType: full
-          # (OPTIONAL) maxAvailableRecentBlocks limits the number of recent blocks DEFAULT: 128 (for "full" nodes).
-          maxAvailableRecentBlocks: 128
-        # ...
-      - endpoint: https://arbitrum.llamarpc.com/{{ getenv "LLAMA_API_KEY" }}
-        id: llama
-        type: evm
-        evm:
-          # (OPTIONAL) chainId is optional and will be detected. DEFAULT: auto-detected.
-          chainId: 42161
-          # (OPTIONAL) statePollerInterval used to periodically fetch the latest/finalized/sync states. DEFAULT: 30s.
-          statePollerInterval: 30s
-          # (OPTIONAL) nodeType is optional and you can manually set it to "full" or "archive". DEFAULT: archive
-          nodeType: full
-          # (OPTIONAL) maxAvailableRecentBlocks limits the number of recent blocks DEFAULT: 128 (for "full" nodes).
-          maxAvailableRecentBlocks: 128
-        # ...
-      - endpoint: https://arbitrum-mainnet.core.chainstack.com/{{ getenv "CS_ARB_API_KEY" }}
-        id: chainstack-arb
-        type: evm
-        evm:
-          # (OPTIONAL) chainId is optional and will be detected. DEFAULT: auto-detected.
-          chainId: 42161
-          # (OPTIONAL) statePollerInterval used to periodically fetch the latest/finalized/sync states. DEFAULT: 30s.
-          statePollerInterval: 30s
-          # (OPTIONAL) nodeType is optional and you can manually set it to "full" or "archive". DEFAULT: archive
-          nodeType: full
-          # (OPTIONAL) maxAvailableRecentBlocks limits the number of recent blocks DEFAULT: 128 (for "full" nodes).
-          maxAvailableRecentBlocks: 128
-        # ...
-      - endpoint: https://ethereum-mainnet.core.chainstack.com/{{ getenv "CS_ETH_API_KEY" }}
-        id: chainstack-eth
-        type: evm
-        evm:
-          # (OPTIONAL) chainId is optional and will be detected. DEFAULT: auto-detected.
-          chainId: 1
-          # (OPTIONAL) statePollerInterval used to periodically fetch the latest/finalized/sync states. DEFAULT: 30s.
-          statePollerInterval: 30s
-          # (OPTIONAL) nodeType is optional and you can manually set it to "full" or "archive". DEFAULT: archive
-          nodeType: full
-          # (OPTIONAL) maxAvailableRecentBlocks limits the number of recent blocks DEFAULT: 128 (for "full" nodes).
-          maxAvailableRecentBlocks: 128
-        # ...
-      - endpoint: https://site1.moralis-nodes.com/arbitrum/{{ getenv "MORALIS_API_KEY" }}
-        id: moralis-one
-        type: evm
-        # ...
-      - endpoint: https://site2.moralis-nodes.com/arbitrum/{{ getenv "MORALIS_API_KEY" }}
-        id: moralis-two
-        type: evm
-        # ...
+      - id: alchemy
+        endpoint: alchemy://$ALCHEMY_API_KEY
+        failsafe:
+          timeout:
+            duration: 15s
+          retry:
+            maxCount: 2
+            delay: 1000ms
+            backoffMaxDelay: 10s
+            backoffFactor: 0.3
+            jitter: 500ms
+      # - id: envio
+      #   endpoint: envio://rpc.hypersync.xyz
+      - id: infura
+        endpoint: infura://$INFURA_API_KEY
+      - id: onerpc
+        endpoint: https://1rpc.io/$ONERPC_API_KEY/arb
+      - id: llama
+        endpoint: https://arbitrum.llamarpc.com/$LLAMA_API_KEY
+      - id: chainstack-arb
+        endpoint: https://arbitrum-mainnet.core.chainstack.com/$CS_ARB_API_KEY
+      - id: chainstack-eth
+        endpoint: https://ethereum-mainnet.core.chainstack.com/$CS_ETH_API_KEY
+      - id: moralis-one
+        endpoint: https://site1.moralis-nodes.com/arbitrum/$MORALIS_API_KEY
+      - id: moralis-two
+        endpoint: https://site2.moralis-nodes.com/arbitrum/$MORALIS_API_KEY
 
 # Rate limiter allows you to create "shared" budgets for upstreams.
 # For example upstream A and B can use the same budget, which means both of them together must not exceed the defined limits.
-rateLimiters:
-  budgets:
-    - id: default-budget
-      rules:
-        - method: "*"
-          maxCount: 10000
-          period: 1s
-    - id: global-blast
-      rules:
-        - method: "*"
-          maxCount: 1000
-          period: 1s
-    - id: global-quicknode
-      rules:
-        - method: "*"
-          maxCount: 300
-          period: 1s
-    - id: frontend-budget
-      rules:
-        - method: "*"
-          maxCount: 500
-          period: 1s
-
-# docker run -d --restart=always -v $(pwd)/erpc.yaml:/root/erpc.yaml -p 4000:4000 -p 4001:4001 --name erpc ghcr.io/erpc/erpc:latest
+# rateLimiters:
+#   budgets:
+#     - id: default-budget
+#       rules:
+#         - method: "*"
+#           maxCount: 10000
+#           period: 1s
+#     - id: global-blast
+#       rules:
+#         - method: "*"
+#           maxCount: 1000
+#           period: 1s
+#     - id: global-quicknode
+#       rules:
+#         - method: "*"
+#           maxCount: 300
+#           period: 1s
+#     - id: frontend-budget
+#       rules:
+#         - method: "*"
+#           maxCount: 500
+#           period: 1s

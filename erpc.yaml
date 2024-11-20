@@ -134,3 +134,5 @@ rateLimiters:
         - method: "*"
           maxCount: 500
           period: 1s
+
+# docker run -d --restart=always -v $(pwd)/erpc.yaml:/root/erpc.yaml -p 4000:4000 -p 4001:4001 --name erpc ghcr.io/erpc/erpc:latest

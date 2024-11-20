@@ -1,8 +1,3 @@
-# Log level helps in debugging or error detection:
-# - debug: information down to actual request and responses, and decisions about rate-liming etc.
-# - info: usually prints happy paths and might print 1 log per request indicating of success or failure.
-# - warn: these problems do not cause end-user problems, but might indicate degredataion or an issue such as cache databse being down.
-# - error: these are problems that have end-user impact, such as misconfigurations.
 logLevel: debug
 
 # There are various use-cases of database in erpc, such as caching, dynamic configs, rate limit persistence, etc.

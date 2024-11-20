@@ -26,6 +26,52 @@ metrics:
 
 projects:
   - id: main
+    auth:
+      strategies:
+      - type: secret
+        ignoreMethods:
+        - eth_getLogs
+        - alchemy_*
+        - trace_*
+        - debug_*
+        secret:
+          value: $RPC_API_SECRET # To use env vars: ${MY_SECRET_VALUE}
+    cors:
+      # List of allowed origins. Use ["*"] to allow any origin
+      allowedOrigins:
+        - "*"
+        - "localhost"
+        - "http://localhost:3000"
+        - "http://localhost:4000"
+        - "http://127.0.0.1:3000"
+        - "http://0.0.0.0:3000"
+        - "http://0.0.0.0:4000"
+        - "https://*.premia.finance"
+        - "https://premia.blue"
+        - "https://*.premia.blue"
+        - "https://archetype.blue"
+        - "https://*.archetype.blue"
+        - "https://kyan.blue"
+        - "https://*.kyan.blue"
+        - "https://kevlar.blue"
+        - "https://*.kevlar.blue"
+      # HTTP methods allowed for CORS requests
+      allowedMethods:
+        - "GET"
+        - "POST"
+        - "OPTIONS"
+      # Headers allowed in actual requests
+      allowedHeaders:
+        - "*"
+        - "Content-Type"
+        - "Authorization"
+      # Headers exposed to the browser
+      exposedHeaders:
+        - "X-Request-ID"
+      # Whether the browser should include credentials with requests
+      allowCredentials: true
+      # How long (in seconds) browsers should cache preflight request results
+      maxAge: 3600
     networks:
       - architecture: evm
         evm:
@@ -61,6 +107,56 @@ projects:
             jitter: 250ms
           #...
     upstreams:
+      - id: envio
+        endpoint: envio://rpc.hypersync.xyz
+      - id: tenderly-arb-private
+        type: evm
+        evm:
+          chainId: 42161
+        endpoint: https://arbitrum.gateway.tenderly.co/$TENDERLY_ARB_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+        allowMethods:
+          - "tenderly_*"
+      - id: tenderly-arb-public
+        type: evm
+        evm:
+          chainId: 42161
+        endpoint: https://arbitrum.gateway.tenderly.co
+        ignoreMethods:
+          - "alchemy_*"
+      - id: tenderly-arb-nova-private
+        type: evm
+        evm:
+          chainId: 42170
+        endpoint: https://arbitrum-nova.gateway.tenderly.co/$TENDERLY_ARB_NOVA_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+        allowMethods:
+          - "tenderly_*"
+      - id: tenderly-arb-nova-public
+        type: evm
+        evm:
+          chainId: 42170
+        endpoint: https://arbitrum-nova.gateway.tenderly.co
+        ignoreMethods:
+          - "alchemy_*"
+      - id: tenderly-arb-sepolia-private
+        type: evm
+        evm:
+          chainId: 421614
+        endpoint: https://arbitrum-sepolia.gateway.tenderly.co/$TENDERLY_ARB_SEP_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+        allowMethods:
+          - "tenderly_*"
+      - id: tenderly-arb-sepolia-public
+        type: evm
+        evm:
+          chainId: 421614
+        endpoint: https://arbitrum-sepolia.gateway.tenderly.co/
+        ignoreMethods:
+          - "alchemy_*"
       - id: alchemy
         endpoint: alchemy://$ALCHEMY_API_KEY
         failsafe:
@@ -80,28 +176,182 @@ projects:
             decreaseFactor: 0.9          # Factor to decrease the limit by (default: 0.9)
             minBudget: 1                 # Minimum rate limit (default: 0)
             maxBudget: 10000             # Maximum rate limit (default: 10000)
-      # - id: envio
-      #   endpoint: envio://rpc.hypersync.xyz
       - id: infura
         endpoint: infura://$INFURA_API_KEY
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
-      - id: onerpc
+      - id: onerpc-arb-private
         type: evm
         evm:
           chainId: 42161
         endpoint: https://1rpc.io/$ONERPC_API_KEY/arb
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
-      - id: llama
+      - id: onerpc-eth-holesky-public
+        type: evm
+        evm:
+          chainId: 17000
+        endpoint: https://1rpc.io/holesky
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: onerpc-eth-sepolia-public
+        type: evm
+        evm:
+          chainId: 17000
+        endpoint: https://1rpc.io/sepolia
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: onerpc-arb-public
+        type: evm
+        evm:
+          chainId: 42161
+        endpoint: https://1rpc.io/arb
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: onerpc-op-public
+        type: evm
+        evm:
+          chainId: 10
+        endpoint: https://1rpc.io/op
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: onerpc-bnb-public
+        type: evm
+        evm:
+          chainId: 56
+        endpoint: https://1rpc.io/bnb
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: onerpc-opbnb-public
+        type: evm
+        evm:
+          chainId: 204
+        endpoint: https://1rpc.io/opbnb
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: onerpc-eth-public
+        type: evm
+        evm:
+          chainId: 1
+        endpoint: https://1rpc.io/eth
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: onerpc-pol-public
+        type: evm
+        evm:
+          chainId: 137
+        endpoint: https://1rpc.io/matic
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: onerpc-pol-zkEVM-public
+        type: evm
+        evm:
+          chainId: 1101
+        endpoint: https://1rpc.io/polygon/zkevm
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: onerpc-base-public
+        type: evm
+        evm:
+          chainId: 8453
+        endpoint: https://1rpc.io/base
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: onerpc-ftm-public
+        type: evm
+        evm:
+          chainId: 250
+        endpoint: https://1rpc.io/ftm
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: onerpc-avax-public
+        type: evm
+        evm:
+          chainId: 43114
+        endpoint: https://1rpc.io/avax/c
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: llama-arb-private
         type: evm
         evm:
           chainId: 42161
         endpoint: https://arbitrum.llamarpc.com/$LLAMA_API_KEY
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: llama-eth-private
+        type: evm
+        evm:
+          chainId: 1
+        endpoint: https://eth.llamarpc.com/$LLAMA_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: llama-base-private
+        type: evm
+        evm:
+          chainId: 8453
+        endpoint: https://base.llamarpc.com/$LLAMA_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: llama-bnb-private
+        type: evm
+        evm:
+          chainId: 56
+        endpoint: https://binance.llamarpc.com/$LLAMA_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: llama-op-private
+        type: evm
+        evm:
+          chainId: 10
+        endpoint: https://optimism.llamarpc.com/$LLAMA_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: llama-pol-private
+        type: evm
+        evm:
+          chainId: 137
+        endpoint: https://polygon.llamarpc.com/$LLAMA_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: llama-eth-public
         type: evm
@@ -110,6 +360,7 @@ projects:
         endpoint: https://eth.llamarpc.com
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: llama-op-public
         type: evm
@@ -118,6 +369,7 @@ projects:
         endpoint: https://optimism.llamarpc.com
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: llama-bnb-public
         type: evm
@@ -126,6 +378,7 @@ projects:
         endpoint: https://binance.llamarpc.com
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: llama-base-public
         type: evm
@@ -134,6 +387,7 @@ projects:
         endpoint: https://base.llamarpc.com
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: llama-arb-public
         type: evm
@@ -142,6 +396,7 @@ projects:
         endpoint: https://arbitrum.llamarpc.com
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: llama-arb-public
         type: evm
@@ -150,6 +405,7 @@ projects:
         endpoint: https://polygon.llamarpc.com
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: chainstack-arb
         type: evm
@@ -158,6 +414,7 @@ projects:
         endpoint: https://arbitrum-mainnet.core.chainstack.com/$CS_ARB_API_KEY
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: chainstack-eth
         type: evm
@@ -166,22 +423,43 @@ projects:
         endpoint: https://ethereum-mainnet.core.chainstack.com/$CS_ETH_API_KEY
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
-      - id: moralis-one
+      - id: moralis-arb-one
         type: evm
         evm:
           chainId: 42161
-        endpoint: https://site1.moralis-nodes.com/arbitrum/$MORALIS_API_KEY
+        endpoint: https://site1.moralis-nodes.com/arbitrum/$MORALIS_ARB_API_KEY
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
-      - id: moralis-two
+      - id: moralis-arb-sep
+        type: evm
+        evm:
+          chainId: 421614
+        endpoint: https://site1.moralis-nodes.com/arbitrum-sepolia/$MORALIS_ARBSEP_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: moralis-arb-backup
         type: evm
         evm:
           chainId: 42161
-        endpoint: https://site2.moralis-nodes.com/arbitrum/$MORALIS_API_KEY
+        endpoint: https://site2.moralis-nodes.com/arbitrum/$MORALIS_ARB_API_KEY
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: moralis-arb-sep-backup
+        type: evm
+        evm:
+          chainId: 421614
+        endpoint: https://site2.moralis-nodes.com/arbitrum-sepolia/$MORALIS_ARBSEP_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: chainstack-binance
         type: evm
@@ -190,6 +468,7 @@ projects:
         endpoint: https://bsc-mainnet.core.chainstack.com/$CS_BNB_API_KEY
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: chainstack-polygon
         type: evm
@@ -198,6 +477,7 @@ projects:
         endpoint: https://polygon-mainnet.core.chainstack.com/$CS_POL_API_KEY
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: chainstack-blast
         type: evm
@@ -206,6 +486,7 @@ projects:
         endpoint: https://blast-mainnet.core.chainstack.com/$CS_BLAST_API_KEY
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: chainstack-optimism
         type: evm
@@ -214,6 +495,7 @@ projects:
         endpoint: https://optimism-mainnet.core.chainstack.com/$CS_OP_API_KEY
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: chainstack-base
         type: evm
@@ -222,14 +504,16 @@ projects:
         endpoint: https://base-mainnet.core.chainstack.com/$CS_BASE_API_KEY
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
-      - id: chainstack-arb-two
+      - id: chainstack-arb-backup
         type: evm
         evm:
           chainId: 42161
         endpoint: https://arbitrum-mainnet.core.chainstack.com/$CS_ARB2_API_KEY
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: chainstack-arb-test
         type: evm
@@ -238,6 +522,7 @@ projects:
         endpoint: https://arbitrum-sepolia.core.chainstack.com/$CS_ARB_API_KEY_TEST
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: chainstack-arb-sep-test
         type: evm
@@ -246,6 +531,61 @@ projects:
         endpoint: https://arbitrum-sepolia.core.chainstack.com/$CS_ARBSEP_API_KEY_TEST
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: quicknode-arb-sep
+        type: evm
+        evm:
+          chainId: 421614
+        endpoint: https://ancient-wild-surf.arbitrum-sepolia.quiknode.pro/$QN_ARBSEP_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: quicknode-arb
+        type: evm
+        evm:
+          chainId: 42161
+        endpoint: https://wandering-shy-mansion.arbitrum-mainnet.quiknode.pro/$QN_ARB_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: quicknode-arb-nova
+        type: evm
+        evm:
+          chainId: 42170
+        endpoint: https://wispy-alien-cloud.nova-mainnet.quiknode.pro/$QN_ARB_NOVA_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: quicknode-eth-holesky
+        type: evm
+        evm:
+          chainId: 17000
+        endpoint: https://side-silent-tab.ethereum-holesky.quiknode.pro/$QN_ETH_HOLESKY_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: quicknode-eth-mainnet
+        type: evm
+        evm:
+          chainId: 1
+        endpoint: https://bold-palpable-wave.quiknode.pro/$QN_ETH_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: quicknode-eth-sepolia
+        type: evm
+        evm:
+          chainId: 1
+        endpoint: https://blue-proportionate-mansion.ethereum-sepolia.quiknode.pro/$QN_ETH_SEP_API_KEY
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: drpc-eth-sep
         type: evm
@@ -254,6 +594,16 @@ projects:
         endpoint: https://sepolia.drpc.org
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: drpc-eth-holesky
+        type: evm
+        evm:
+          chainId: 17000
+        endpoint: https://holesky.drpc.org
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
       - id: panda-eth-sep
         type: evm
@@ -262,6 +612,16 @@ projects:
         endpoint: https://rpc.sepolia.ethpandaops.io
         ignoreMethods:
           - "alchemy_*"
+          - "trace_*"
+          - "eth_traceTransaction"
+      - id: offchain-arb-nova
+        type: evm
+        evm:
+          chainId: 42170
+        endpoint: https://nova.arbitrum.io/rpc
+        ignoreMethods:
+          - "alchemy_*"
+          - "trace_*"
           - "eth_traceTransaction"
 
 

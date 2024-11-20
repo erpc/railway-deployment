@@ -14,9 +14,9 @@ RUN gomplate -f /root/erpc.yaml.template -o /root/erpc.yaml
 FROM ghcr.io/erpc/erpc:latest
 
 # Set environment variables (these can be empty or set by your CI/CD environment)
-ENV ALCHEMY_API_KEY="" \
-    BLASTAPI_API_KEY="" \
-    DRPC_API_KEY=""
+# ENV ALCHEMY_API_KEY="" \
+#     BLASTAPI_API_KEY="" \
+#     DRPC_API_KEY=""
 
 # Copy processed config from builder
 COPY --from=builder /root/erpc.yaml /root/erpc.yaml

@@ -34,16 +34,81 @@ metrics:
 projects:
   - id: main
     upstreams:
-      {{ if getenv "ALCHEMY_API_KEY" }}
       - endpoint: alchemy://{{ getenv "ALCHEMY_API_KEY" }}
-      {{ end }}
-      {{ if getenv "BLASTAPI_API_KEY" }}
-      - endpoint: blastapi://{{ getenv "BLASTAPI_API_KEY" }}
-      {{ end }}
-      {{ if getenv "DRPC_API_KEY" }}
-      - endpoint: drpc://{{ getenv "DRPC_API_KEY" }}
-      {{ end }}
       - endpoint: envio://rpc.hypersync.xyz
+      - endpoint: infura://{{ getenv "INFURA_API_KEY" }}
+        id: infura
+        type: evm
+        evm:
+          # (OPTIONAL) chainId is optional and will be detected. DEFAULT: auto-detected.
+          chainId: 42161
+          # (OPTIONAL) statePollerInterval used to periodically fetch the latest/finalized/sync states. DEFAULT: 30s.
+          statePollerInterval: 30s
+          # (OPTIONAL) nodeType is optional and you can manually set it to "full" or "archive". DEFAULT: archive
+          nodeType: full
+          # (OPTIONAL) maxAvailableRecentBlocks limits the number of recent blocks DEFAULT: 128 (for "full" nodes).
+          maxAvailableRecentBlocks: 128
+        # ...
+      - endpoint: https://1rpc.io/{{ getenv "ONERPC_API_KEY" }}/arb
+        id: onerpc
+        type: evm
+        evm:
+          # (OPTIONAL) chainId is optional and will be detected. DEFAULT: auto-detected.
+          chainId: 42161
+          # (OPTIONAL) statePollerInterval used to periodically fetch the latest/finalized/sync states. DEFAULT: 30s.
+          statePollerInterval: 30s
+          # (OPTIONAL) nodeType is optional and you can manually set it to "full" or "archive". DEFAULT: archive
+          nodeType: full
+          # (OPTIONAL) maxAvailableRecentBlocks limits the number of recent blocks DEFAULT: 128 (for "full" nodes).
+          maxAvailableRecentBlocks: 128
+        # ...
+      - endpoint: https://arbitrum.llamarpc.com/{{ getenv "LLAMA_API_KEY" }}
+        id: llama
+        type: evm
+        evm:
+          # (OPTIONAL) chainId is optional and will be detected. DEFAULT: auto-detected.
+          chainId: 42161
+          # (OPTIONAL) statePollerInterval used to periodically fetch the latest/finalized/sync states. DEFAULT: 30s.
+          statePollerInterval: 30s
+          # (OPTIONAL) nodeType is optional and you can manually set it to "full" or "archive". DEFAULT: archive
+          nodeType: full
+          # (OPTIONAL) maxAvailableRecentBlocks limits the number of recent blocks DEFAULT: 128 (for "full" nodes).
+          maxAvailableRecentBlocks: 128
+        # ...
+      - endpoint: https://arbitrum-mainnet.core.chainstack.com/{{ getenv "CS_ARB_API_KEY" }}
+        id: chainstack-arb
+        type: evm
+        evm:
+          # (OPTIONAL) chainId is optional and will be detected. DEFAULT: auto-detected.
+          chainId: 42161
+          # (OPTIONAL) statePollerInterval used to periodically fetch the latest/finalized/sync states. DEFAULT: 30s.
+          statePollerInterval: 30s
+          # (OPTIONAL) nodeType is optional and you can manually set it to "full" or "archive". DEFAULT: archive
+          nodeType: full
+          # (OPTIONAL) maxAvailableRecentBlocks limits the number of recent blocks DEFAULT: 128 (for "full" nodes).
+          maxAvailableRecentBlocks: 128
+        # ...
+      - endpoint: https://ethereum-mainnet.core.chainstack.com/{{ getenv "CS_ETH_API_KEY" }}
+        id: chainstack-eth
+        type: evm
+        evm:
+          # (OPTIONAL) chainId is optional and will be detected. DEFAULT: auto-detected.
+          chainId: 1
+          # (OPTIONAL) statePollerInterval used to periodically fetch the latest/finalized/sync states. DEFAULT: 30s.
+          statePollerInterval: 30s
+          # (OPTIONAL) nodeType is optional and you can manually set it to "full" or "archive". DEFAULT: archive
+          nodeType: full
+          # (OPTIONAL) maxAvailableRecentBlocks limits the number of recent blocks DEFAULT: 128 (for "full" nodes).
+          maxAvailableRecentBlocks: 128
+        # ...
+      - endpoint: https://site1.moralis-nodes.com/arbitrum/{{ getenv "MORALIS_API_KEY" }}
+        id: moralis-one
+        type: evm
+        # ...
+      - endpoint: https://site2.moralis-nodes.com/arbitrum/{{ getenv "MORALIS_API_KEY" }}
+        id: moralis-two
+        type: evm
+        # ...
 
 # Rate limiter allows you to create "shared" budgets for upstreams.
 # For example upstream A and B can use the same budget, which means both of them together must not exceed the defined limits.

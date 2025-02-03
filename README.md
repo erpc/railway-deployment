@@ -14,7 +14,7 @@ Apache 2.0
 
 [ci-badge]: https://img.shields.io/badge/CI-passing-brightgreen
 [ci-url]: https://github.com/erpc/erpc/actions/workflows/development.yml
-[tg-badge]: https://img.shields.io/endpoint?color=neon&logo=telegram&label=chat&url=https%3A%2F%2Ftg.sumanjay.workers.dev%erpc_cloud%5Freth
+[tg-badge]: https://img.shields.io/endpoint?color=neon&logo=telegram&label=chat&url=https%3A%2F%2Ftg.sumanjay.workers.dev%erpc%5Fcloud
 [tg-url]: https://t.me/erpc_cloud
 [license-badge]: https://img.shields.io/github/license/erpc/erpc
 [license-url]: https://github.com/erpc/erpc/blob/main/LICENSE

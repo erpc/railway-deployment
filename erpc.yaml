@@ -1,9 +1,5 @@
 logLevel: debug
 
-database:
-  evmJsonRpcCache:
-    driver: memory
-
 server:
   httpHostV4: "0.0.0.0"
   listenV6: true

@@ -1,0 +1,3 @@
+[submodule "erpc"]
+	path = erpc
+	url = https://github.com/erpc/erpc

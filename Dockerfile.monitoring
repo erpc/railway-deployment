@@ -21,7 +21,7 @@ COPY --from=prometheus /bin/prometheus /bin/prometheus
 COPY --from=prometheus /bin/promtool   /bin/promtool
 # We need to copy the prometheus.yml locally configure railwayway deployment env variables
 COPY prometheus.yml /etc/prometheus/prometheus.yml
-COPY --from=erpc_fetcher /tmp/erpc/monitoring/prometheus/alert.rules     /etc/prometheus/alert.rules
+COPY alert.rules     /etc/prometheus/alert.rules
 
 COPY --from=grafana /usr/share/grafana /usr/share/grafana
 COPY --from=grafana /etc/grafana       /etc/grafana

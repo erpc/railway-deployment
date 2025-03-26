@@ -6,9 +6,12 @@ global:
    - alert.rules
  
  scrape_configs:
+   - job_name: 'prometheus'
+     static_configs:
+       - targets: ['localhost:9090']
+ 
    - job_name: 'erpc'
      static_configs:
-       # Replace placeholder values in Prometheus config for railway deployment
        - targets: ['REPLACE_SERVICE_ENDPOINT_HERE:REPLACE_SERVICE_PORT_HERE']
  
  alerting:

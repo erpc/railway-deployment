@@ -16,15 +16,17 @@ FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y curl
 
+# Set environment variables
+ENV SERVICE_ENDPOINT=""
+ENV SERVICE_PORT=""
+
 COPY --from=prometheus /bin/prometheus /bin/prometheus
 COPY --from=prometheus /bin/promtool   /bin/promtool
-
 COPY --from=erpc_fetcher /tmp/erpc/monitoring/prometheus/prometheus.yml /etc/prometheus/prometheus.yml
 COPY --from=erpc_fetcher /tmp/erpc/monitoring/prometheus/alert.rules     /etc/prometheus/alert.rules
 
 COPY --from=grafana /usr/share/grafana /usr/share/grafana
 COPY --from=grafana /etc/grafana       /etc/grafana
-
 COPY --from=erpc_fetcher /tmp/erpc/monitoring/grafana/grafana.ini                    /etc/grafana/grafana.ini
 COPY --from=erpc_fetcher /tmp/erpc/monitoring/grafana/datasources/prometheus.yml     /etc/grafana/provisioning/datasources/prometheus.yml
 COPY --from=erpc_fetcher /tmp/erpc/monitoring/grafana/dashboards/default.yml         /etc/grafana/provisioning/dashboards/default.yml
